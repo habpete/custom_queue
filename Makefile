@@ -23,3 +23,7 @@ get:
 .PHONY: build
 build:
 	go build -o ./bin/main ./cmd
+
+.PHONY: docker-build
+docker-build:
+	docker build ./docker/
