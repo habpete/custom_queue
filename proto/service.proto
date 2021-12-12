@@ -7,6 +7,8 @@ import "google/protobuf/struct.proto";
 
 service MessageQueue {
     rpc Send(SendRequest) returns (SendResponse);
+    rpc SetDone(SetDoneRequest) returns (SetDoneResponse);
+    rpc GetMessages(GetMessagesRequest) returns (GetMessagesResponse);
 }
 
 message SendRequest {
@@ -22,3 +24,11 @@ message SendResponse {
         Failed = 2;
     }
 }
+
+message SetDoneRequest {}
+
+message SetDoneResponse {}
+
+message GetMessagesRequest {}
+
+message GetMessagesResponse {}
