@@ -4,10 +4,18 @@ import (
 	"log"
 
 	"github.com/custom_queue/internal/app"
+	"github.com/custom_queue/internal/storage"
 )
 
 func main() {
-	if err := app.Start(); err != nil {
+	strg, err := storage.New(&storage.ConnectParams{})
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	srv := app.NewService(strg)
+
+	if err := app.Start(srv); err != nil {
 		log.Fatal(err)
 	}
 }

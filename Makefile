@@ -27,3 +27,8 @@ build:
 .PHONY: docker-build
 docker-build:
 	docker build ./docker/
+
+.PHONY: up-postgres
+up-postgres:
+	docker pull postgres
+	docker run -d --name some-postgres -e POSTGRES_PASSWORD=mysecretpassword postgres -c shared_buffers=256MB -c max_connections=200

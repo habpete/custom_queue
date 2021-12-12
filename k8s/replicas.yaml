@@ -7,7 +7,7 @@ metadata:
     tier: queue
 spec:
   # modify replicas according to your case
-  replicas: 3
+  replicas: 1
   selector:
     matchLabels:
       tier: queue
@@ -19,3 +19,5 @@ spec:
       containers:
       - name: queue
         image: https://hub.docker.com/r/habuhaev96/custom_queue:latest
+      - name: postgres
+        image: https://hub.docker.com/_/postgres
