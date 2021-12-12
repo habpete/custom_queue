@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	pb "../../pkg/proto"
+	pb "github.com/custom_queue/pkg/proto"
 )
 
 func (Service) Send(ctx context.Context, req *pb.SendRequest) (*pb.SendResponse, error) {

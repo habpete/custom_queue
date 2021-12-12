@@ -2,6 +2,7 @@ package app
 
 import (
 	"fmt"
+	"log"
 	"net"
 
 	pb "github.com/custom_queue/pkg/proto"
@@ -17,6 +18,7 @@ func Start() error {
 	grpcServer := grpc.NewServer()
 	pb.RegisterMessageQueueServer(grpcServer, &Service{})
 
+	log.Print("service started on port 8082")
 	if err := grpcServer.Serve(listener); err != nil {
 		return fmt.Errorf("failed to start GRPC service: %v", err)
 	}

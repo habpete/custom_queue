@@ -22,4 +22,4 @@ get:
 
 .PHONY: build
 build:
-	go build ./cmd
+	go build -o ./bin/main ./cmd
