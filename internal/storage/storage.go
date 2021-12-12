@@ -3,6 +3,7 @@ package storage
 import (
 	"context"
 	"database/sql"
+	"time"
 
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
@@ -84,4 +85,27 @@ func (i *Storage) UpdateStatus(ctx context.Context, params *UpdateStatusParams) 
 	}
 
 	return nil
+}
+
+type GetMessageParams struct {
+	Topic    string
+	Statuses []string
+	Limit    int
+}
+
+type GetMessageResult struct {
+	Id        int                        `db:"id"`
+	CreatedAt time.Time                  `db:"created_at"`
+	Message   map[string]*structpb.Value `db:"message_data"`
+}
+
+const getMessageQuery = "SELECT id, created_at, message_data FROM public.events WHERE topic_id = (SELECT id FROM public.topic WHERE title = $1) AND status_id IN (SELECT id FROM public.statuses WHERE title = $2 OR title = $3) LIMIT $4"
+
+func (i *Storage) GetMessage(ctx context.Context, params *GetMessageParams) ([]*GetMessageResult, error) {
+	result := make([]*GetMessageResult, params.Limit)
+	if err := i.db.SelectContext(ctx, result, getMessageQuery, params.Topic, params.Statuses[0], params.Statuses[1], params.Limit); err != nil {
+		return nil, errors.Wrapf(err, "get message query failed: %v", err)
+	}
+
+	return result, nil
 }
