@@ -33,7 +33,7 @@ type SendMessageParams struct {
 
 const (
 	selectTopicQuery  = "SELECT id FROM public.topic WHERE title = $1 LIMIT 1"
-	selectStatusQuery = "SELECT status FROM public.statuses WHERE title = $1 LIMIT 1"
+	selectStatusQuery = "SELECT id FROM public.statuses WHERE title = $1 LIMIT 1"
 	insertEventQuery  = "INSERT INTO public.events (status_id, topic_id, created_at, message_data) VALUES ($1, $2, current_timestamp, $3)"
 )
 
@@ -66,6 +66,21 @@ func (i *Storage) SendMessage(ctx context.Context, params *SendMessageParams) er
 
 	if _, err = i.db.ExecContext(ctx, insertEventQuery, statusID, topicID, params.message); err != nil {
 		return errors.Wrapf(err, "insert event query failed: %v", err)
+	}
+
+	return nil
+}
+
+type UpdateStatusParams struct {
+	MessageID int
+	Status    string
+}
+
+const updateStatusQuery = "UPDATE public.events SET status_id=(SELECT id FROM public.statuses WHERE title = $1 LIMIT 1) WHERE id = $2"
+
+func (i *Storage) UpdateStatus(ctx context.Context, params *UpdateStatusParams) error {
+	if _, err := i.db.ExecContext(ctx, updateStatusQuery, params.Status, params.MessageID); err != nil {
+		return errors.Wrapf(err, "update status query failed: %v", err)
 	}
 
 	return nil
