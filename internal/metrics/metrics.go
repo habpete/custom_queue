@@ -1,15 +1,30 @@
 package metrics
 
 import (
+	"time"
+
 	prometheus "github.com/prometheus/client_golang/prometheus"
 )
 
 var (
-	errorsHistogram = prometheus.NewCounterVec(prometheus.CounterOpts{}, []string{"handler"})
+	errorsCounter = prometheus.NewCounterVec(prometheus.CounterOpts{}, []string{"handler"})
+
+	timerHistogram = prometheus.NewHistogramVec(prometheus.HistogramOpts{}, []string{"handler"})
 )
 
-prometheus.MustRegister(errorsHistogram)
+func init() {
+	prometheus.MustRegister(errorsCounter)
+	prometheus.MustRegister(timerHistogram)
+}
 
 func ErrorsInc(src string) {
-	errorsHistogram.WithLabelValues(src).Inc()
+	errorsCounter.WithLabelValues(src).Inc()
+}
+
+func TimerHistogram(src string) func() {
+	startTime := time.Now()
+
+	return func() {
+		timerHistogram.WithLabelValues(src).Observe(float64(time.Since(startTime)))
+	}
 }
