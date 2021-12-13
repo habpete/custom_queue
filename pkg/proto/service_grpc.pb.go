@@ -23,6 +23,8 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type MessageQueueClient interface {
 	Send(ctx context.Context, in *SendRequest, opts ...grpc.CallOption) (*SendResponse, error)
+	SetDone(ctx context.Context, in *SetDoneRequest, opts ...grpc.CallOption) (*SetDoneResponse, error)
+	GetMessages(ctx context.Context, in *GetMessagesRequest, opts ...grpc.CallOption) (*GetMessagesResponse, error)
 }
 
 type messageQueueClient struct {
@@ -42,11 +44,31 @@ func (c *messageQueueClient) Send(ctx context.Context, in *SendRequest, opts ...
 	return out, nil
 }
 
+func (c *messageQueueClient) SetDone(ctx context.Context, in *SetDoneRequest, opts ...grpc.CallOption) (*SetDoneResponse, error) {
+	out := new(SetDoneResponse)
+	err := c.cc.Invoke(ctx, "/MessageQueue/SetDone", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *messageQueueClient) GetMessages(ctx context.Context, in *GetMessagesRequest, opts ...grpc.CallOption) (*GetMessagesResponse, error) {
+	out := new(GetMessagesResponse)
+	err := c.cc.Invoke(ctx, "/MessageQueue/GetMessages", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // MessageQueueServer is the server API for MessageQueue service.
 // All implementations must embed UnimplementedMessageQueueServer
 // for forward compatibility
 type MessageQueueServer interface {
 	Send(context.Context, *SendRequest) (*SendResponse, error)
+	SetDone(context.Context, *SetDoneRequest) (*SetDoneResponse, error)
+	GetMessages(context.Context, *GetMessagesRequest) (*GetMessagesResponse, error)
 	mustEmbedUnimplementedMessageQueueServer()
 }
 
@@ -56,6 +78,12 @@ type UnimplementedMessageQueueServer struct {
 
 func (UnimplementedMessageQueueServer) Send(context.Context, *SendRequest) (*SendResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Send not implemented")
+}
+func (UnimplementedMessageQueueServer) SetDone(context.Context, *SetDoneRequest) (*SetDoneResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SetDone not implemented")
+}
+func (UnimplementedMessageQueueServer) GetMessages(context.Context, *GetMessagesRequest) (*GetMessagesResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetMessages not implemented")
 }
 func (UnimplementedMessageQueueServer) mustEmbedUnimplementedMessageQueueServer() {}
 
@@ -88,6 +116,42 @@ func _MessageQueue_Send_Handler(srv interface{}, ctx context.Context, dec func(i
 	return interceptor(ctx, in, info, handler)
 }
 
+func _MessageQueue_SetDone_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SetDoneRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MessageQueueServer).SetDone(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/MessageQueue/SetDone",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MessageQueueServer).SetDone(ctx, req.(*SetDoneRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MessageQueue_GetMessages_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetMessagesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MessageQueueServer).GetMessages(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/MessageQueue/GetMessages",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MessageQueueServer).GetMessages(ctx, req.(*GetMessagesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // MessageQueue_ServiceDesc is the grpc.ServiceDesc for MessageQueue service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -98,6 +162,14 @@ var MessageQueue_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Send",
 			Handler:    _MessageQueue_Send_Handler,
+		},
+		{
+			MethodName: "SetDone",
+			Handler:    _MessageQueue_SetDone_Handler,
+		},
+		{
+			MethodName: "GetMessages",
+			Handler:    _MessageQueue_GetMessages_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
