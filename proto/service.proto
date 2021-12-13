@@ -25,10 +25,18 @@ message SendResponse {
     }
 }
 
-message SetDoneRequest {}
+message SetDoneRequest {
+    int64 message_id = 1;
+}
 
 message SetDoneResponse {}
 
-message GetMessagesRequest {}
+message GetMessagesRequest {
+    string topic = 1;
+    int64 limit = 2;
+}
 
-message GetMessagesResponse {}
+message GetMessagesResponse {
+    int64 message_id = 1;
+    map<string, google.protobuf.Value> message = 2;
+}
