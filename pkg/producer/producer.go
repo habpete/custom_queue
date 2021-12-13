@@ -13,7 +13,7 @@ type Producer struct {
 }
 
 func New(grpcHost string) (*Producer, error) {
-	conn, err := grpc.Dial(grpcHost, grpc.WithInsecure)
+	conn, err := grpc.Dial(grpcHost, grpc.WithInsecure())
 	if err != nil {
 		return nil, err
 	}

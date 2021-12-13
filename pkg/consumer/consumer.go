@@ -13,7 +13,7 @@ type Consumer struct {
 }
 
 func New(grpcHost string) (*Consumer, error) {
-	conn, err := grpc.Dial(grpcHost, grpc.WithInsecure)
+	conn, err := grpc.Dial(grpcHost, grpc.WithInsecure())
 	if err != nil {
 		return nil, err
 	}
