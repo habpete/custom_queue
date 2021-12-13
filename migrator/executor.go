@@ -16,6 +16,10 @@ func migrate(ctx context.Context, pathToMigrations string) error {
 		return errors.Wrapf(err, "read directory failed: %v", err)
 	}
 
+	if err = checkVersion(ctx, ""); err != nil {
+		return err
+	}
+
 	for _, file := range files {
 		if err = execute(ctx, path.Join(pathToMigrations, file.Name())); err != nil {
 			return errors.Wrapf(err, "migration for file %s failed: %v", file.Name(), err)
